@@ -22,6 +22,7 @@ DockDBusProxy::DockDBusProxy(DockPanel* parent)
     , m_oldDockApplet(nullptr)
     , m_multitaskviewApplet(nullptr)
     , m_trayApplet(nullptr)
+    , m_resizeDockTimer(new QTimer())
 {
     registerPluginInfoMetaType();
 
@@ -57,6 +58,12 @@ DockDBusProxy::DockDBusProxy(DockPanel* parent)
         }
     });
     timer->start();
+
+    m_resizeDockTimer->setInterval(10);
+    m_resizeDockTimer->setSingleShot(true);
+    connect(m_resizeDockTimer, &QTimer::timeout, parent, [this, parent] {
+        parent->setDockSize(m_dockSize);
+    });
 }
 
 DockPanel* DockDBusProxy::parent() const
@@ -130,7 +137,8 @@ uint DockDBusProxy::windowSizeEfficient()
 void DockDBusProxy::setWindowSizeEfficient(uint size)
 {
     qDebug() << size;
-    parent()->setDockSize(size);
+    m_dockSize = size;
+    m_resizeDockTimer->start();
 }
 
 uint DockDBusProxy::windowSizeFashion()
@@ -140,7 +148,8 @@ uint DockDBusProxy::windowSizeFashion()
 
 void DockDBusProxy::setWindowSizeFashion(uint size)
 {
-    parent()->setDockSize(size);
+    m_dockSize = size;
+    m_resizeDockTimer->start();
 }
 
 int DockDBusProxy::displayMode()
@@ -265,7 +274,8 @@ QString DockDBusProxy::getPluginKey(const QString &pluginName)
 void DockDBusProxy::resizeDock(int offset, bool dragging)
 {
     Q_UNUSED(dragging)
-    parent()->setDockSize(offset);
+    m_dockSize = offset;
+    m_resizeDockTimer->start();
 }
 
 bool DockDBusProxy::showInPrimary() const

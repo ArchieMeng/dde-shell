@@ -14,6 +14,7 @@
 #include <QObject>
 #include <QDBusContext>
 #include <QDBusArgument>
+#include <QTimer>
 
 /** this class used for old dock api compatible
   * it will forward old dbus call to new implementation
@@ -85,6 +86,8 @@ private:
     DS_NAMESPACE::DAppletProxy *m_oldDockApplet;
     DS_NAMESPACE::DAppletProxy *m_multitaskviewApplet;
     DS_NAMESPACE::DAppletProxy *m_trayApplet;
+    uint   m_dockSize;
+    QTimer *m_resizeDockTimer;
 };
 }
 
